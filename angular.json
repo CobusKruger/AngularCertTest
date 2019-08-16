@@ -67,7 +67,10 @@
           },
           "configurations": {
             "production": {
-              "browserTarget": "CertTest:build:production"
+              "browserTarget": "CertTest:build:production",
+              "ssl": true,
+              "sslKey": "./certs/localhost.key",
+              "sslCert": "./certs/localhost.crt"
             }
           }
         },

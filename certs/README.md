@@ -1,0 +1,1 @@
+Place your self-signed certificate and key in this folder (name them `localhost.crt` and `localhost.key` to match the instructions).

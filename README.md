@@ -1,27 +1,44 @@
-# CertTest
+# SSL with NG Serve
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 8.2.0.
+This is a test app to show how to serve Angular over SSL when using `ng serve`.
 
-## Development server
+The best reference is: https://medium.com/@richardr39/using-angular-cli-to-serve-over-https-locally-70dab07417c8
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+# Summary
 
-## Code scaffolding
+Summing up the linked article, follow these steps to the letter. There is no point deviating, because it will waste hours of your life.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+1. Create a file named `certificate.cnf`, with the following content (taken directly from the article, except for renaming `CN`):
 
-## Build
-
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `--prod` flag for a production build.
-
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+```ini
+[req]
+default_bits = 2048
+prompt = no
+default_md = sha256
+x509_extensions = v3_req
+distinguished_name = dn
+[dn]
+C = GB
+ST = London
+L = London
+O = My Organisation
+OU = My Organisational Unit
+emailAddress = email@domain.com
+CN = Angular Local Dev
+[v3_req]
+subjectAltName = @alt_names
+[alt_names]
+DNS.1 = localhost
+```
+2. Open Git Bash. If you don't have it, just install Git for Windows. `git-bash.exe` is in the same folder as `git.exe`.
+3. In Git Bash, navigate to your chosen folder and execute the following:
+```bash
+openssl req -new -x509 -newkey rsa:2048 -sha256 -nodes -keyout localhost.key -days 3560 -out localhost.crt -config certificate.cnf
+```
+4. You will now have two new files in the folder, namely `localhost.key` and `localhost.crt`. Double-click `localhost.crt` and install it in the user's `Trusted Root Certificate Authorities` store.
+5. Copy `localhost.key` and `localhost.crt` to your Angular project, under a folder named `certs`. This is a top-level folder, on the same level as `src`.
+6. To run `ng serve` with SSL, execute the command like this:
+```bash
+ng serve --ssl --sslKey ./certs/localhost.key --sslCert ./certs/localhost.crt
+```
+7. Don't bother trying to specify SSL settings in the `angular.json` file. It doesn't work at all at the time of writing.
